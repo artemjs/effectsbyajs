@@ -48,10 +48,13 @@ const frame = (mode, x, W = W0, H = H0) => page.evaluate(async ({ rel, mode, x, 
   if (rf) {
     const vb = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement.getAttribute('viewBox').split(/[\s,]+/).map(Number);
     const { layers, front, horizon } = rf.splitLayers(svg), Y = y => rf.fitY(vb, box, y);
+    // the artwork's own rectangle inside the box (contain-fit) — reflections must not leak into the margins
+    const k = Math.min(box[2] / vb[2], box[3] / vb[3]), aw = vb[2] * k, ah = vb[3] * k;
+    const art = [box[0] + (box[2] - aw) / 2, box[1] + (box[3] - ah) / 2, aw, ah];
     const paint = (c, s) => mode === 'still' ? m.drawShape(c, m.fit(s, box)) : m.play(c, m.fit(s, box), x, { step: .5, len: .8 });
     for (const L of layers) {
       paint(ctx, L.svg);
-      if (Number.isFinite(L.y)) rf.reflect(ctx, mode === 'still' ? 0 : x, { y: Y(L.y), horizon: Y(horizon), x0: box[0], x1: box[0] + box[2], depth: box[1] + box[3] - Y(L.y), clip: c => c.rect(...box), source: c => paint(c, L.svg) });
+      if (Number.isFinite(L.y)) rf.reflect(ctx, mode === 'still' ? 0 : x, { y: Y(L.y), horizon: Y(horizon), x0: art[0], x1: art[0] + art[2], depth: art[1] + art[3] - Y(L.y), clip: c => c.rect(...art), source: c => paint(c, L.svg) });
     }
     paint(ctx, front);
   } else if (mode === 'still') m.drawShape(ctx, art);
