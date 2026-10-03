@@ -71,11 +71,40 @@ that belong to the place and tell its story.
 - Soft light (glows, reflections, mist) is always a radial gradient fading to transparent — never a flat ellipse with
   lowered opacity.
 
+## Water and reflections
+- **Reflections are computed, not drawn** — unless stylized drawn reflections are part of the concept. Leave the water as
+  a surface (its own color/gradient + genuine surface marks: a few highlights, mist), mark `data-waterline="y"` on the
+  root (the far shore), and put everything that must not be mirrored (near bank, reeds, floating things) in groups with
+  `data-layer="front"`. look.mjs and films render the reflection with the `reflection` effect.
+- Each object reflects about **its own** water-contact line: give nearer shores/objects their own
+  `data-waterline` (or `data-reflect-y`) on their group. Things that recede in depth (a dock) reflect per part or stay
+  in front.
+- The water's base value decides how the reflection reads: dark water = strong reflection, light water = faint.
+
+## Night, rain, wet surfaces
+- Night walls get darker toward the ground; lit windows and lamps are the only warm saturated accents.
+- Wet ground mirrors lights as long, narrow vertical streaks (not ladders or blobs); wet stones catch light only
+  inside those streaks, as the far-edge sliver of each stone. Puddles are flat mirrors with dark edges.
+- Anything that reflects a light must appear in the build after that light comes on.
+
+## Geometry hygiene (artifacts)
+- **No self-intersecting outlines.** Crossings fill as holes and show as thin light slivers inside dark shapes
+  (classic in generated trees). Build trees from non-crossing tiers or a monotonic outline; nonzero fill rule.
+- **No ruler-straight long edges** on natural things (land, shores, rocks): irregular, with thickness and breaks.
+- **Facets are not polygons**: keep the facet structure of mountains but make edges irregular and give faces internal
+  variation (gradients along the slope, rock bands, scree) — or they read as low-poly triangles.
+- Curves overshoot: clamp Bézier/Catmull-Rom **control points**, not just anchors, and clamp after jitter.
+
 ## Technical
 - Valid XML only (`data-piece=""`, not `data-piece`); look.mjs refuses invalid SVG.
 - Keep all geometry inside the viewBox — morph does not clip; look.mjs warns.
 - Build order tells the story: the focal light gets its own later `data-order` (the window lights up last);
   `data-sketch="none"` for glows, stars and reflections.
+- Document order = paint order; `data-order` = reveal time — also on nested groups, so a highlight can paint under
+  something and still appear later.
+- Build near objects in world coordinates with one camera (eye level, eye height, focal length) and project them:
+  vanishing points, plank spacing, scale with depth and foreshortening then come for free and stay consistent.
+- Glows in a rect filled with a radial gradient (in the rect's own box), not huge ellipses — they spill the frame.
 
 ## Lessons from iterations
 Lake cabin at dusk (vector-lab/landscape):
@@ -84,3 +113,11 @@ Lake cabin at dusk (vector-lab/landscape):
   light; mountains as faces; ragged conifers; gradient glows. *(user: "generally not bad")*
 - v4 review *(user, confirmed)*: perspective problems; the picture is still empty — elements are missing; the sky looks
   strange. → sections Perspective, Filling the picture, Sky above.
+- v5–v8 (artist): one projected camera fixed perspective; mountain as facets fanning out from the summit (crests
+  diagonal, not vertical "organ pipes"); ragged snow tongues in gullies, never ribbons; clouds lit from below by
+  stacked shifted copies of the mass, the lit copies narrower so light shows only underneath.
+- *(user, confirmed)*: reflections must be real (computed), not hand-drawn → section Water and reflections.
+- v8 *(user, confirmed)*: "triangle artifacts" — slivers in self-intersecting trees, a straight-edged land slab, low-poly
+  mountain facets → section Geometry hygiene; look.mjs now writes 2× zooms.
+Night street after rain (blind test, short prompt only):
+- reached the lake scene's level from the skill alone (v10); lessons on wet ground → section Night, rain, wet surfaces.
