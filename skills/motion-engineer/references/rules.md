@@ -25,6 +25,7 @@ These are constraints, not suggestions. Each one exists because the default with
   morphs between shapes. Avoid linear motion and plain opacity fades.
 - Em-dashes and purple-blue gradients are tells of generic AI output. Do not use them in on-screen copy
   or as backgrounds — unless the film is deliberately mocking them (then destroy them on screen).
+  Hyphens and minus signs are fine: "-20%" with a hyphen-minus, or U+2212 (−) if the font has it (check the subset).
 
 ## Transitions
 - Cuts land on beats, with a short flash and a whoosh into the cut.

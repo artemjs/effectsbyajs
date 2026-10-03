@@ -19,7 +19,8 @@ holds attention. Keep that, change everything else.
 - Geometry scenes: a field of shapes driven by one formula (distance to a moving point, `sin(d/90 - t*6)`),
   appearing in a diagonal wave (`delay = (row + col) * .025`).
 - Radial burst: rays from a center with length kicked by `pulse`, rings expanding on each beat, a counter
-  0→100 (`eOut` over ~2 s) in the middle on a solid disc.
+  0→100 (`eOut` over ~2 s) in the middle on a solid disc. The disc holds for several beats — escalate it
+  (grow a step per beat, roll a caption under it, swap the plate color on the last beat; see craft.md).
 - Tunnel: nested rotated rectangles moving toward the camera (`z = (i/16 + step*.07 + t*.12) % 1`), outlined
   marquee rows on solid bands top and bottom.
 - Split screen: two halves slide in from opposite sides (.25 s apart), text drifts inside them.

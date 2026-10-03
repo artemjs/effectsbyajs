@@ -35,7 +35,7 @@ References the user gives (a screenshot, a site, a film) outrank everything else
 
 | Situation | Do |
 |---|---|
-| empty dir / no app | `node <skill>/scripts/init.mjs <dir>` → `index.html`, `film/film.mjs`, `BRIEF.md`, `.effectsbyajs/pipeline/`, puppeteer devDependency; then `npm install` |
+| empty dir / no app | `node <skill>/scripts/init.mjs <dir>` → `index.html`, `film/film.mjs` (a placeholder — replace it entirely), `BRIEF.md`, `.effectsbyajs/pipeline/`, puppeteer devDependency; then `npm install` |
 | existing app (React, Vite, Next, Svelte…) | `node <skill>/scripts/init.mjs <dir> --integrate` → only `.effectsbyajs/pipeline/`; mount the film on a canvas — see [references/integrate.md](references/integrate.md) |
 | existing film | read its `BRIEF.md` / `CLAUDE.md` and the scene code first |
 
@@ -60,6 +60,8 @@ A scene is `{ at, draw(f) }`; `f = { ctx, W, H, t, lt, dur, duration, beat, bpm,
   moments that matter. A soft limiter keeps peaks at −1 dBTP. Music beyond that belongs to the music-engineer
   skill when it exists.
 - Fonts: explicit, via `loadFonts` + `ready` (recipe in the template's film.mjs and in `pipeline/fonts.mjs`).
+- A track from the user (or "make it to this song"): use the **music-engineer** skill first — it gives the beat
+  grid, sections, drops and the segment, and `f.music` in every scene.
 
 ## 5. The loop — before showing anything
 
@@ -67,6 +69,7 @@ A scene is `{ at, draw(f) }`; `f = { ctx, W, H, t, lt, dur, duration, beat, bpm,
    Then `sheet.mjs --cuts --out out/cuts.png` — frames around every cut and the loop seam; that is where
    empty frames, jumps and glitches hide. For any other moment: `--times 14.6,14.7,…`.
    A tile that looks wrong: open the full-size frame (the script prints where).
+   Sound: `node <skill>/scripts/render.mjs --root <dir> --audio-only` (seconds) — LUFS and true peak after AAC.
 2. Score 1–10 with the anchors in rules.md: hook · readability · motion quality · variety · brand accuracy · sound sync.
 3. Fix the three worst problems. Repeat until every score is 8+.
 4. Only then: `node <skill>/scripts/render.mjs --root <dir>` → `out/film.mp4` (H.264 High, yuv420p, CRF 16)

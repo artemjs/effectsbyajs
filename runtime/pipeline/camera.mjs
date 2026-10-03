@@ -21,10 +21,10 @@ export function handheld(o = {}) {
   };
 }
 
-/** Short light flash on cuts. cuts — cut times in seconds. */
+/** Short light flash on cuts. cuts — cut times in seconds; default: the film's hard cuts (not continuous joins). */
 export function cutFlash(cuts, color = '250,249,245', len = .12, alpha = .3) {
   return f => {
-    for (const c of cuts) {
+    for (const c of cuts ?? f.cuts) {
       const d = f.t - c;
       if (d >= 0 && d < len) {
         f.ctx.fillStyle = `rgba(${color},${alpha * (1 - d / len)})`;

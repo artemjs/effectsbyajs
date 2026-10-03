@@ -11,22 +11,23 @@ import { renderScore, groove } from '../.effectsbyajs/pipeline/synth.mjs';
 import { attachPlayer } from '../.effectsbyajs/pipeline/player.mjs';
 import { cl, eOut } from '../.effectsbyajs/pipeline/math.mjs';
 import { fitText } from '../.effectsbyajs/pipeline/text.mjs';
-import { loadFonts } from '../.effectsbyajs/pipeline/fonts.mjs';
+import { loadFonts, RANGES } from '../.effectsbyajs/pipeline/fonts.mjs';
 
 const BG = '#141413', FG = '#faf9f5', AC = '#d97757';
 const DURATION = 4, BPM = 120;
 const CUTS = [2];
 
 // Fonts: explicit, so no frame is captured with a fallback face. Get them with
-// npm i -D @fontsource-variable/<name>, copy the .woff2 into film/fonts/ (+ the license), then e.g.:
+// npm i -D @fontsource-variable/<name> (or static @fontsource/<name> — then one face per weight with `weight`),
+// copy the .woff2 into film/fonts/ (+ the license), then e.g.:
 // const FONT = '"Display", system-ui, sans-serif';
 // const fonts = loadFonts([
-//   { family: 'Display', src: new URL('fonts/display-cyrillic.woff2', import.meta.url).href, unicodeRange: 'U+0400-045F' },
-//   { family: 'Display', src: new URL('fonts/display-latin.woff2', import.meta.url).href, unicodeRange: 'U+0000-00FF' }
+//   { family: 'Display', src: new URL('fonts/display-cyrillic-900.woff2', import.meta.url).href, weight: '900', unicodeRange: RANGES.cyrillic },
+//   { family: 'Display', src: new URL('fonts/display-latin-900.woff2', import.meta.url).href, weight: '900', unicodeRange: RANGES.latin }
 // ]);
 // …and pass `ready: fonts` to createFilm, `{ font: FONT }` to fitText.
 
-// Placeholder hook: one word per beat. Replace with the scenes from BRIEF.md.
+// Placeholder hook: one word per beat. Replace the whole thing with the scenes from BRIEF.md.
 const words = ['ONE', 'WORD', 'PER', 'BEAT'];
 const hook = f => {
   const i = Math.min(words.length - 1, Math.floor(f.lt / f.beat)), dt = f.lt - i * f.beat;
@@ -39,9 +40,10 @@ const hook = f => {
 const film = createFilm({
   canvas: document.getElementById('film'),
   duration: DURATION, bpm: BPM, fps: 60, background: BG,
+  // join: 'continuous' marks a join without a cut (no flash); marks: extra moments for sheet --cuts
   scenes: [{ at: 0, draw: hook }, { at: 2, draw: hook }],
   camera: handheld(),
-  post: cutFlash(CUTS),
+  post: cutFlash(),
   audio: sampleRate => renderScore({
     duration: DURATION, sampleRate,
     score: kit => groove(kit, { duration: DURATION, beat: 60 / BPM, cuts: CUTS })

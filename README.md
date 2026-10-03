@@ -9,7 +9,7 @@ a render pipeline to MP4, and a library of ready-made effects.
 |---|---|
 | `motion-engineer` | brief → project (new or integrated into an app) → scenes → contact-sheet loop → MP4 |
 | `useeffects` | list / install / update effects from the registry, local showcase server |
-| `music-engineer` | planned |
+| `music-engineer` | analyze a track (beat grid, sections, drops, segments), cut a film to it; music in code |
 
 ## Install
 ```
@@ -48,7 +48,7 @@ skills/useeffects/        SKILL.md, scripts/ (effects, hostShowcase), assets/sho
 | `film did not call expose(film)` | the page threw before `expose` — the error lines are printed under the message; fix the import paths first |
 | text renders in a fallback font | load fonts with `loadFonts` and pass the promise as `ready`; check the face covers your script |
 | font 404 | relative URLs resolve against the page — use `new URL('fonts/x.woff2', import.meta.url).href` |
-| `WARNING: true peak above −1 dBTP` | the mix is too hot; lower accents or pass `ceiling` to `renderScore` |
+| `WARNING: true peak above −1 dBTP` | render normalizes and limits automatically; if it still warns, lower the loudest accents and re-run `render.mjs --audio-only` |
 | `checksum mismatch` on effects add | the archive changed under the same version — re-run later; report it if it persists |
 | effects add 404 right after publishing | Cloudflare cached a 404 from an earlier request; wait a few minutes |
 

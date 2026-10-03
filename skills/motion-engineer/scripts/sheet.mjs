@@ -5,7 +5,7 @@
 //
 // node sheet.mjs [--root .] [--page index.html | --url ...] [--out out/sheet.png]
 //                [--offset .2] [--times 1.5,2.25,...] [--cuts] [--cols 8] [--tile 216] [--frames dir]
-// --cuts: frames around every scene start and the loop seam instead of one per beat. The per-beat sheet
+// --cuts: frames around every cut, continuous join, mark (createFilm({ marks })) and the loop seam. The per-beat sheet
 //         samples after the hit has settled, so empty frames, jumps and glitches at cuts only show up here.
 
 import { spawnSync } from 'node:child_process';
@@ -17,13 +17,13 @@ import { args } from '../../../runtime/project.mjs';
 const a = args(), root = path.resolve(a.root || '.');
 const out = path.resolve(root, a.out || 'out/sheet.png');
 const film = await openFilm({ root, page: a.page, url: a.url });
-const { duration, bpm, cuts, w, h } = film.info;
+const { duration, bpm, cuts, joins = [], marks = [], w, h } = film.info;
 
 // default: every beat, slightly after the hit (the hit frame itself is mid-slam)
 const beat = 60 / bpm, offset = +(a.offset ?? .2);
 const around = c => [-.1, .02, .08, .16, .3].map(d => +(((c + d) % duration + duration) % duration).toFixed(3));
 const times = a.times ? String(a.times).split(',').map(Number)
-  : a.cuts ? [...cuts, 0].flatMap(around)
+  : a.cuts ? [...new Set([...cuts, ...joins, ...marks, 0])].sort((x, y) => x - y).flatMap(around)
   : Array.from({ length: Math.round(duration / beat) }, (_, i) => +(i * beat + offset).toFixed(3));
 
 const dir = path.resolve(root, a.frames || out.replace(/\.png$/, '') + '-frames');   // one dir per sheet
