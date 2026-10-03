@@ -45,6 +45,7 @@ if (a.clicks) {
       buf.writeFloatLE(buf.readFloatLE((s0 + i) * 4) + g * Math.sin(2 * Math.PI * hz * i / sr) * Math.exp(-i / (sr * .006)), (s0 + i) * 4);
   }
   const clicksOut = path.resolve(root, a.clicks);
+  mkdirSync(path.dirname(clicksOut), { recursive: true });
   const c = spawnSync('ffmpeg', ['-y', '-v', 'error', '-i', track, '-f', 'f32le', '-ar', String(sr), '-ac', '1', '-i', '-',
     '-filter_complex', '[0:a]volume=0.7[m];[m][1:a]amix=inputs=2:normalize=0', clicksOut], { input: buf, maxBuffer: 1 << 30 });
   if (c.status !== 0) console.error(`click track failed: ${c.stderr}`); else console.log(`clicks: ${clicksOut}`);
