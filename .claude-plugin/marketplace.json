@@ -1,0 +1,11 @@
+{
+  "name": "effectsbyajs",
+  "owner": { "name": "Artem Bohdanov", "email": "artemjson@gmail.com" },
+  "plugins": [
+    {
+      "name": "effectsbyajs",
+      "source": "./",
+      "description": "Motion engineering: Canvas 2D films, render pipeline, effects library"
+    }
+  ]
+}

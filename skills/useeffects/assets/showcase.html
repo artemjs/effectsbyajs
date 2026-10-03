@@ -1,0 +1,65 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT · Copyright (c) 2026 Artem Bohdanov -->
+<!-- Effects showcase, served by hostShowcase.mjs. Each effect's showcase.mjs default-exports
+     { title, width, height, duration, bpm?, draw(ctx, t, f) } and is rendered as a looping, scrubbable card. -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>effectsbyajs · showcase</title>
+<style>
+  :root { --bg: #141413; --fg: #faf9f5; --mid: #b0aea5; --ac: #d97757; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.4 system-ui, sans-serif; }
+  header { padding: 20px 24px 4px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+  h1 { font-size: 20px; margin: 0; }
+  header span { color: var(--mid); }
+  main { display: flex; flex-wrap: wrap; gap: 24px; padding: 16px 24px 40px; }
+  figure { margin: 0; width: 320px; }
+  canvas { width: 100%; display: block; background: #000; border-radius: 10px; cursor: pointer; }
+  figcaption { display: flex; justify-content: space-between; padding: 8px 2px; }
+  figcaption a { color: var(--ac); text-decoration: none; }
+  input[type=range] { width: 100%; accent-color: var(--ac); }
+  .err { color: #ff8a7a; white-space: pre-wrap; font: 12px ui-monospace, monospace; }
+</style>
+<header><h1>effectsbyajs</h1><span id="status">loading…</span></header>
+<main id="grid"></main>
+<script type="module">
+  const only = new URLSearchParams(location.search).get('effect');
+  const names = (await (await fetch('/__effects.json')).json()).filter(n => !only || n === only);
+  document.getElementById('status').textContent =
+    names.length ? `${names.length} effect${names.length > 1 ? 's' : ''} · tap a card to pause` : 'no effects with a showcase installed — effects.mjs add <name>';
+
+  const cards = [];
+  for (const name of names) {
+    const fig = document.createElement('figure');
+    fig.innerHTML = `<canvas></canvas><input type="range" min="0" max="1000" value="0">
+      <figcaption><b>${name}</b><a href="?effect=${name}">solo</a></figcaption>`;
+    document.getElementById('grid').append(fig);
+    try {
+      const { default: s } = await import(`/.effectsbyajs/effects/${name}/showcase.mjs`);
+      const c = fig.querySelector('canvas'), range = fig.querySelector('input');
+      c.width = s.width; c.height = s.height;
+      if (only) fig.style.width = 'min(90vw, 480px)';
+      fig.querySelector('b').textContent = s.title || name;
+      const card = { s, ctx: c.getContext('2d'), range, playing: true, t0: performance.now(), tPaused: 0 };
+      c.onclick = () => { card.playing = !card.playing; card.t0 = performance.now() - card.tPaused * 1000; };
+      range.oninput = () => { card.playing = false; card.tPaused = range.value / 1000 * s.duration; };
+      await s.ready;
+      cards.push(card);
+    } catch (e) {
+      fig.insertAdjacentHTML('beforeend', `<div class="err">${e.stack || e}</div>`);
+    }
+  }
+
+  // the preview loop only calls draw(t); every effect frame is a pure function of t
+  function frame(now) {
+    for (const c of cards) {
+      const { s, ctx } = c, dur = s.duration;
+      const t = c.playing ? ((now - c.t0) / 1000) % dur : c.tPaused;
+      if (c.playing) { c.tPaused = t; c.range.value = t / dur * 1000; }
+      const beat = 60 / (s.bpm || 120);
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, s.width, s.height);
+      s.draw(ctx, t, { ctx, W: s.width, H: s.height, t, lt: t, dur, duration: dur, beat, bpm: s.bpm || 120, pulse: Math.exp(-((t % beat) / beat) * 6) });
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+</script>
