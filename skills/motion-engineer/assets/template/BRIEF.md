@@ -6,6 +6,8 @@
 
 **Story in one line:** <what the viewer should feel/understand at the end>
 
+**Style:** <styles/<name>.md (or a mix) — and what you change about it for this film>
+
 **Format:** <1080×1920 9:16> · <N> s loop · <BPM> BPM (<beats> beats) · <fps> fps · on-screen language: <lang>
 
 **Look**

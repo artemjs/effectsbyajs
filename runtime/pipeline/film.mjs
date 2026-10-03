@@ -35,7 +35,8 @@ export function createFilm(o) {
     o.post?.(f);
   }
 
-  return { canvas, ctx, W, H, duration, fps, bpm, beat, render, audio: o.audio, ready: o.ready ?? Promise.resolve() };
+  return { canvas, ctx, W, H, duration, fps, bpm, beat, render, audio: o.audio, ready: o.ready ?? Promise.resolve(),
+    cuts: sorted.slice(1).map(s => s.at) };
 }
 
 /** Public contract for render.mjs / sheet.mjs: window.seek, DURATION, FPS, filmReady, exportWav. */

@@ -31,7 +31,7 @@ export async function openFilm({ root, page = 'index.html', url }) {
     throw new Error(`film did not call expose(film) at ${target.href}\n${errors.join('\n')}`);
   }
   await tab.evaluate(() => window.filmReady);
-  const info = await tab.evaluate(() => ({ duration: window.DURATION, fps: window.FPS, bpm: window.__film.bpm, w: window.__film.W, h: window.__film.H }));
+  const info = await tab.evaluate(() => ({ duration: window.DURATION, fps: window.FPS, bpm: window.__film.bpm, cuts: window.__film.cuts, w: window.__film.W, h: window.__film.H }));
   await tab.setViewport({ width: info.w, height: info.h, deviceScaleFactor: 1 });
 
   const frame = t => tab.evaluate(t => { window.seek(t); return window.__film.canvas.toDataURL('image/png'); }, t)

@@ -70,18 +70,36 @@ export function groove(kit, { duration, beat, cuts = [], roots = [41.2, 41.2, 49
 }
 
 /**
- * Renders a score into an AudioBuffer. score(kit, ctx) schedules sounds.
- * The master runs through a compressor (≈ −14 LUFS for social; measure the result, see render.mjs).
+ * Renders a score into an AudioBuffer. score(kit, ctx, master) schedules sounds; `master` is the bus before
+ * the compressor, so a score can insert its own processing (connect to it, or reroute).
+ * The master runs through a compressor (≈ −14 LUFS for social) and then a soft limiter at `ceiling` dBFS,
+ * so peaks never clip. render.mjs measures loudness and true peak — check them.
  */
-export async function renderScore({ duration, sampleRate = 48000, seed = 42, score }) {
+export async function renderScore({ duration, sampleRate = 48000, seed = 42, ceiling = -1, score }) {
   const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
   const o = new OAC(2, Math.ceil(sampleRate * duration), sampleRate);
   const comp = o.createDynamicsCompressor();
   comp.threshold.value = -14; comp.ratio.value = 4; comp.attack.value = .003; comp.release.value = .15;
   const master = o.createGain(); master.gain.value = .8;
   master.connect(comp); comp.connect(o.destination);
-  score(makeKit(o, master, seed), o);
-  return o.startRendering();
+  score(makeKit(o, master, seed), o, master);
+  return limit(await o.startRendering(), ceiling);
+}
+
+/**
+ * Soft-knee limiter in place, ceiling in dBFS. Below 70 % of the ceiling the signal passes untouched (loudness
+ * is kept); above it peaks are bent with tanh toward the ceiling instead of clipping. Deterministic.
+ */
+export function limit(buffer, ceiling = -1) {
+  const c = Math.pow(10, ceiling / 20), k = .7 * c, r = c - k;
+  for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+    const d = buffer.getChannelData(ch);
+    for (let i = 0; i < d.length; i++) {
+      const a = Math.abs(d[i]);
+      if (a > k) d[i] = Math.sign(d[i]) * (k + r * Math.tanh((a - k) / r));
+    }
+  }
+  return buffer;
 }
 
 /** AudioBuffer → 16-bit PCM WAV as base64 (handed to Node by the renderer). */

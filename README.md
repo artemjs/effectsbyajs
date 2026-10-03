@@ -20,6 +20,7 @@ Needs Node 18+, ffmpeg in PATH; projects get `puppeteer` as a devDependency (`in
 
 ## Layout
 ```
+styles/              directions shared by all skills: kinetic-type, product-showcase, character-story, editorial
 runtime/pipeline/    the film engine, copied into projects as .effectsbyajs/pipeline/
   film.mjs           createFilm, expose, isRenderMode
   math.mjs           mulberry32, hash, easings, pulse
@@ -38,6 +39,18 @@ skills/useeffects/        SKILL.md, scripts/ (effects, hostShowcase), assets/sho
   effects/<name>/    installed effects: index.mjs, <name>.mjs, *.d.ts, showcase.mjs, README.md
   effects.json       installed versions
 ```
+
+## If something does not work
+| symptom | fix |
+|---|---|
+| `"puppeteer" not found` | `npm i -D puppeteer` in the project (init.mjs adds it; run `npm install`) |
+| `ffmpeg` not found / exits non-zero | install ffmpeg and make sure it is in PATH (`brew install ffmpeg`, `apt install ffmpeg`) |
+| `film did not call expose(film)` | the page threw before `expose` — the error lines are printed under the message; fix the import paths first |
+| text renders in a fallback font | load fonts with `loadFonts` and pass the promise as `ready`; check the face covers your script |
+| font 404 | relative URLs resolve against the page — use `new URL('fonts/x.woff2', import.meta.url).href` |
+| `WARNING: true peak above −1 dBTP` | the mix is too hot; lower accents or pass `ceiling` to `renderScore` |
+| `checksum mismatch` on effects add | the archive changed under the same version — re-run later; report it if it persists |
+| effects add 404 right after publishing | Cloudflare cached a 404 from an earlier request; wait a few minutes |
 
 ## License
 MIT © Artem Bohdanov. Every source file carries the MIT header.

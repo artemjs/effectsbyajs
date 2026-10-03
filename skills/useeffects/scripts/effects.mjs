@@ -67,6 +67,7 @@ switch (cmd) {
     for (const [n, e] of Object.entries(cat)) {
       const have = manifest.effects[n];
       console.log(`${have ? (have === e.version ? '✓' : '↑') : ' '} ${n}@${e.version}  ${e.description}${e.deps?.length ? `  [deps: ${e.deps.join(', ')}]` : ''}`);
+      if (e.exports?.length) console.log(`    exports: ${e.exports.join(', ')}`);
     }
     break;
   }

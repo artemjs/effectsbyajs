@@ -45,9 +45,13 @@ await film.close();
 if (film.errors.length) console.warn('\npage errors:\n' + film.errors.join('\n'));
 if (code !== 0) { console.error(`\nffmpeg exited with ${code}`); process.exit(1); }
 
-let lufs = 'no audio';
+let sound = 'no audio';
 if (wav) {
-  const r = spawnSync('ffmpeg', ['-nostats', '-i', out, '-af', 'ebur128', '-f', 'null', '-'], { encoding: 'utf8' });
-  lufs = (r.stderr.match(/I:\s+(-?[\d.]+) LUFS/g) || []).pop()?.replace(/\s+/g, ' ') ?? 'unmeasured';
+  const r = spawnSync('ffmpeg', ['-nostats', '-i', out, '-af', 'ebur128=peak=true', '-f', 'null', '-'], { encoding: 'utf8' });
+  const lufs = +(r.stderr.match(/I:\s+(-?[\d.]+) LUFS/g) || []).pop()?.match(/-?[\d.]+/)[0];
+  const peak = +(r.stderr.match(/Peak:\s+(-?[\d.]+) dBFS/g) || []).pop()?.match(/-?[\d.]+/)[0];
+  sound = `loudness ${lufs} LUFS (target −14) · true peak ${peak} dBTP (max −1)`;
+  if (peak > -1) sound += '\nWARNING: true peak above −1 dBTP — the audio will clip after encoding. Lower the mix or renderScore({ ceiling }).';
+  if (Math.abs(lufs + 14) > 1.5) sound += '\nWARNING: loudness is more than 1.5 LU off −14.';
 }
-console.log(`\ndone: ${out}\n${duration}s · ${fps} fps · ${total} frames · loudness ${lufs} (target −14 LUFS)`);
+console.log(`\ndone: ${out}\n${duration}s · ${fps} fps · ${total} frames · ${sound}`);
