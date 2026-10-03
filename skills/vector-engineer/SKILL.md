@@ -15,9 +15,12 @@ Never ship a first draft.
 
 ## The loop
 1. **Concept first** (2–4 lines in the brief): subject, mood, light source and time of day, palette (3–5 values
-   plus one accent), composition (where the eye goes first, second, third), what will move.
+   plus one accent), composition (where the eye goes first, second, third), eye level, what will move — and a list
+   of the things that would really be in this place (see "Filling the picture").
 2. **Block in** big shapes only — silhouettes and value masses. Check the still: does it read as a thumbnail?
-3. **Refine**: secondary shapes, overlaps, edges, light and shadow, then details — only where the eye goes.
+3. **Refine**: perspective check (eye level, vanishing points, scale), secondary shapes, overlaps, light and shadow,
+   then the details that fill the place — densest at the focal point, but no dead zones. Sky with real bands and
+   cloud volume. All of it in [references/artwork.md](references/artwork.md) — read it before drawing.
 4. **Look**: `node <skill>/scripts/look.mjs <art.svg> --out out/look/vN` → `still.png` (what films draw),
    `compare.png` (browser | morph — differences mean unsupported SVG), `sketch.png`, `build.png`. Open them.
 5. **Score** 1–10 with the rubric in [references/artwork.md](references/artwork.md); fix the three worst problems;
