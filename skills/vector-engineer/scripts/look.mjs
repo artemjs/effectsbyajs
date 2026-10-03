@@ -46,6 +46,23 @@ const frame = (mode, x) => page.evaluate(async ({ rel, mode, x, W, H }) => {
   return c.toDataURL('image/png');
 }, { rel, mode, x, W, H }).then(u => Buffer.from(u.split(',')[1], 'base64'));
 
+// checks first: invalid XML (browsers refuse it, the morph parser may not) and geometry outside the viewBox
+// (morph does not clip — anything outside shows up outside the art box in films)
+const check = await page.evaluate(async rel => {
+  const svg = await (await fetch('/' + rel)).text();
+  const doc = new DOMParser().parseFromString(svg, 'image/svg+xml'), err = doc.querySelector('parsererror');
+  if (err) return { xml: err.textContent.trim().split('\n').slice(0, 2).join(' ') };
+  const m = await import('/.effectsbyajs/effects/morph/index.mjs');
+  const vb = (doc.documentElement.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number), b = m.bounds(svg);
+  return { vb, b };
+}, rel);
+if (check.xml) { console.error(`invalid SVG/XML — fix it first (e.g. attributes need values: data-piece=""):\n${check.xml}`); await browser.close(); server.close(); process.exit(1); }
+const warnings = [];
+if (check.vb.length === 4 && check.b) {
+  const [x, y, w, h] = check.vb, { b } = check, over = Math.max(x - b.x, y - b.y, b.x + b.w - (x + w), b.y + b.h - (y + h));
+  if (over > 1) warnings.push(`geometry reaches ${over.toFixed(0)} units outside the viewBox (morph does not clip) — clamp it to the frame`);
+}
+
 mkdirSync(out, { recursive: true });
 writeFileSync(path.join(out, 'still.png'), await frame('still'));
 writeFileSync(path.join(out, 'compare.png'), await frame('compare'));
@@ -64,4 +81,5 @@ await sheet('build', Array.from({ length: 8 }, (_, i) => +((end + 1) * (i + 1) /
 await browser.close(); server.close();
 
 console.log(`look: ${out}/  still.png · compare.png (browser | morph) · sketch.png · build.png (until ${end.toFixed(1)} s + idle)`);
+if (warnings.length) console.log('WARNING: ' + warnings.join('\nWARNING: '));
 if (errors.length) console.log('page errors:\n' + errors.join('\n'));
