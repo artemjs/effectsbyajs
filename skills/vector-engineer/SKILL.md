@@ -4,6 +4,9 @@ description: Draw real vector artwork as SVG — illustrations, landscapes, flow
 ---
 <!-- SPDX-License-Identifier: MIT · Copyright (c) 2026 Artem Bohdanov -->
 
+> **Before starting:** run the acceptance step from the `effectsbyajs` skill (`<plugin>/skills/effectsbyajs/SKILL.md`)
+> unless this task was already accepted in this conversation — it also says which other skills this task needs.
+
 # Vector engineer
 
 Paths: `<skill>` is this skill's base directory, `<plugin>` is `<skill>/../..`. Animation is done by the `morph`

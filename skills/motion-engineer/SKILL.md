@@ -4,6 +4,9 @@ description: Make high-motion videos, promos, showcases, kinetic typography, ani
 ---
 <!-- SPDX-License-Identifier: MIT · Copyright (c) 2026 Artem Bohdanov -->
 
+> **Before starting:** run the acceptance step from the `effectsbyajs` skill (`<plugin>/skills/effectsbyajs/SKILL.md`)
+> unless this task was already accepted in this conversation — it also says which other skills this task needs.
+
 # Motion engineer
 
 You make films that look like a strong motion designer made them. Each frame is `render(t)` — a pure

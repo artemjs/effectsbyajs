@@ -1,6 +1,6 @@
 {
   "name": "effectsbyajs",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Motion engineering for Claude Code: films as pure functions of time in Canvas 2D, a render pipeline, and a library of ready-made effects",
   "author": { "name": "Artem Bohdanov", "email": "artemjson@gmail.com" },
   "license": "MIT",

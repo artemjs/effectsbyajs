@@ -4,6 +4,9 @@ description: Music for films and motion — analyze a track (tempo, beat grid, d
 ---
 <!-- SPDX-License-Identifier: MIT · Copyright (c) 2026 Artem Bohdanov -->
 
+> **Before starting:** run the acceptance step from the `effectsbyajs` skill (`<plugin>/skills/effectsbyajs/SKILL.md`)
+> unless this task was already accepted in this conversation — it also says which other skills this task needs.
+
 # Music engineer
 
 Paths: `<skill>` is this skill's base directory, `<plugin>` is `<skill>/../..`. Films themselves are made with the

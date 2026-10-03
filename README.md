@@ -7,9 +7,16 @@ a render pipeline to MP4, and a library of ready-made effects.
 ## Skills
 | skill | does |
 |---|---|
+| `effectsbyajs` | entry point: which skill for which task, and the accept / deny step |
 | `motion-engineer` | brief → project (new or integrated into an app) → scenes → contact-sheet loop → MP4 |
 | `useeffects` | list / install / update effects from the registry, local showcase server |
 | `music-engineer` | analyze a track (beat grid, sections, drops, segments), cut a film to it; music in code |
+
+## Asking first
+In Claude Code the plugin proposes a plan before it starts (which skills, what it will make, what it downloads):
+`/effectsbyajs:accept` starts it, `/effectsbyajs:deny` skips the plugin for that task,
+`/effectsbyajs:noacceptance` stops the questions (`/effectsbyajs:acceptance` brings them back; the choice is saved
+in `~/.effectsbyajs/settings.json`). Outside Claude Code (no `CLAUDECODE=1`) it never asks and just works.
 
 ## Install
 ```
